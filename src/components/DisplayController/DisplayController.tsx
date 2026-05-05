@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from "react";
-import Display from "../Display/Display";
+import Display, { LCDDisplayProps } from "../Display/Display";
 
 interface DisplayOptions {
     demoOn?: boolean;
@@ -16,12 +16,58 @@ interface DisplayOptions {
     }
 }
 
+interface OtherIndicationSettings {
+    EQ?: {
+        EQ?: ((timer: number) => boolean) | boolean;
+        line?: ((timer: number) => boolean) | boolean;
+        CLASSIC?: ((timer: number) => boolean) | boolean;
+        HIPHOP?: ((timer: number) => boolean) | boolean;
+        JAZZ?: ((timer: number) => boolean) | boolean;
+        ROCK?: ((timer: number) => boolean) | boolean;
+        POPS?: ((timer: number) => boolean) | boolean;
+        USER?: ((timer: number) => boolean) | boolean;
+    };
+    LOUD?: ((timer: number) => boolean) | boolean;
+    CH?: ((timer: number) => boolean) | boolean;
+    DISC?: ((timer: number) => boolean) | boolean;
+    RND?: {
+        RND_disp?: ((timer: number) => boolean) | boolean;
+        trackRnd?: ((timer: number) => boolean) | boolean;
+        folderRnd?: ((timer: number) => boolean) | boolean;
+    };
+    RPT?: {
+        RPT_disp?: ((timer: number) => boolean) | boolean;
+        trackRpt?: ((timer: number) => boolean) | boolean;
+        folderRpt?: ((timer: number) => boolean) | boolean;
+    };
+    HOLD?: ((timer: number) => boolean) | boolean;
+    HD?: ((timer: number) => boolean) | boolean;
+
+    TAG?: {
+        TAG_disp?: ((timer: number) => boolean) | boolean;
+        trackTag?: ((timer: number) => boolean) | boolean;
+        folderTag?: ((timer: number) => boolean) | boolean;
+    };
+    AF?: ((timer: number) => boolean) | boolean;
+    REG?: ((timer: number) => boolean) | boolean;
+    TP?: ((timer: number) => boolean) | boolean;
+    PTY?: ((timer: number) => boolean) | boolean;
+    ST?: ((timer: number) => boolean) | boolean;
+    MO?: ((timer: number) => boolean) | boolean;
+
+    currentTimeDivider01?: ((timer: number) => boolean) | boolean;
+    currentTimeDivider02?: ((timer: number) => boolean) | boolean;
+
+    trackNumberIndication?: ((timer: number) => boolean) | boolean;
+};
+
 interface DisplayDemoData {
     animation: {
         mode: "default" | "move" | "default-new";
         direction?: "left" | "right" | null;
     }
     text: string;
+    otherIndication?: OtherIndicationSettings;
     nextDelay: number;
 }
 
@@ -148,14 +194,19 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                 mode: "default-new",
             },
             text: "   DEMO    ",
-            nextDelay: 115,
+            nextDelay: 125,
+            // otherIndication: {
+            //     EQ: {
+            //         CLASSIC: (t) => (t % 64) < 32
+            //     }
+            // },
         },
         {
             animation: {
                 mode: "default-new",
             },
             text: "255+ FOLDER",
-            nextDelay: 30,
+            nextDelay: 70,
         },
         {
             animation: {
@@ -192,7 +243,7 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                 mode: "default-new"
             },
             text: "ОТОБРАЖАЕТ ",
-            nextDelay: 30,
+            nextDelay: 70,
         },
         {
             animation: {
@@ -237,7 +288,7 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                 mode: "default-new",
             },
             text: " BUILT-IN  ",
-            nextDelay: 30,
+            nextDelay: 70,
         },
         {
             animation: {
@@ -268,7 +319,7 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                 mode: "default-new"
             },
             text: " AUTOMATIC ",
-            nextDelay: 30,
+            nextDelay: 70,
         },
         {
             animation: {
@@ -299,7 +350,7 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                 mode: "default-new",
             },
             text: "  99-LIST  ",
-            nextDelay: 30,
+            nextDelay: 70,
         },
         {
             animation: {
@@ -323,7 +374,7 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                 mode: "default-new"
             },
             text: "  3 BAND   ",
-            nextDelay: 30,
+            nextDelay: 70,
         },
         {
             animation: {
@@ -355,35 +406,60 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                 mode: "default-new"
             },
             text: "  CLASSIC  ",
-            nextDelay: 125,
+            nextDelay: 162,
+            otherIndication: {
+                EQ: {
+                    CLASSIC: (t) => (t % 64) < 32
+                }
+            },
         },
         {
             animation: {
                 mode: "default-new"
             },
             text: "  HIP HOP  ",
-            nextDelay: 125,
+            nextDelay: 162,
+            otherIndication: {
+                EQ: {
+                    HIPHOP: (t) => (t % 64) < 32
+                }
+            },
         },
         {
             animation: {
                 mode: "default-new"
             },
             text: "   JAZZ    ",
-            nextDelay: 125,
+            nextDelay: 162,
+            otherIndication: {
+                EQ: {
+                    JAZZ: (t) => (t % 64) < 32
+                }
+            },
         },
         {
             animation: {
                 mode: "default-new"
             },
             text: "   ROCK    ",
-            nextDelay: 125,
+            nextDelay: 162,
+            otherIndication: {
+                EQ: {
+                    ROCK: (t) => (t % 64) < 32
+                }
+            },
         },
         {
             animation: {
                 mode: "default-new"
             },
             text: "   POPS    ",
-            nextDelay: 125,
+            nextDelay: 162,
+            otherIndication: {
+                EQ: {
+                    POPS: (t) => (t % 64) < 32
+                }
+            },
         },
         {
             animation: {
@@ -395,6 +471,9 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
 
     ];
 
+    const otherIndicationRef = useRef<LCDDisplayProps['otherIndication'] | undefined>(undefined);
+    const [otherIndication, setOtherIndication] = useState<LCDDisplayProps['otherIndication'] | undefined>();
+
     const dataRef = useRef<string[][]>([
         [], [], [], [], [], [], [], [], [], [], []
     ]);
@@ -403,6 +482,26 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
         [], [], [], [], [], [], [], [], [], [], []
         // ["Х"], ["Ц"], ["Ч"], ["Ш"], ["Щ"], ["Ы"], ["Ъ"], ["Ь"], ["Э"], ["Ю"], ["Я"]
     ]);
+
+    const updateOtherIndication = (data?: LCDDisplayProps['otherIndication']) => {
+        setOtherIndication(data);
+        otherIndicationRef.current = data;
+    }
+
+    const displayOtherIndication = (timer: number, indicationOptions: OtherIndicationSettings | Record<string, any>): LCDDisplayProps['otherIndication'] => {
+        let result: LCDDisplayProps['otherIndication'] = {};
+        for (const k in indicationOptions) {
+            const key = k as keyof OtherIndicationSettings;
+            if (typeof indicationOptions[key] === 'object') {
+                result = {
+                    ...result,
+                    [key]: displayOtherIndication(timer, indicationOptions[key])
+                }
+            } else if (typeof indicationOptions[key] === 'function') result[key] = indicationOptions[key](timer);
+            else result[key] = indicationOptions[key];
+        }
+        return result;
+    }
 
     const updateData = (data: string[][]) => {
         setData(data);
@@ -423,8 +522,15 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
             timer++;
 
             if (demoOn) {
-                if (demoNextTimer > 0) demoNextTimer--;
-                else if (timer % 4 === 0) {
+                if (demoNextTimer > 0) {
+                    if (demoInfo[demoPosition - 1]?.otherIndication) {
+                        updateOtherIndication(
+                            // displayOtherIndication(timer, otherIndicationRef.current as OtherIndicationSettings)
+                            displayOtherIndication(((demoInfo[demoPosition - 1]?.nextDelay || 0) - demoNextTimer), demoInfo[demoPosition - 1].otherIndication as OtherIndicationSettings)
+                        );
+                    }
+                    demoNextTimer--;
+                } else if (timer % 4 === 0) {
                     if (animIdx < 45) {
 
                         if (demoAnimationData.mode === 'default') {
@@ -436,7 +542,7 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
                                 updateData(data.map((s, i) => (i === (animIdx - 14)) ? [
                                     demoInfo[demoPosition] ? demoInfo[demoPosition].text[(animIdx - 14)] : ""
                                 ] : (i === (animIdx - 13)) ? ["-"] : dataRef.current[i]));
-                            } else animIdx = 9999;
+                            } else animIdx = 999;
 
                             animIdx++;
                         } else if (demoAnimationData.mode === 'default-new') {
@@ -508,7 +614,7 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
 
                                 // ));
                                 // alert(animIdx)
-                            }
+                            } else animIdx = 999;
 
                             animIdx++;
                         } else if (demoAnimationData.mode === 'move') {
@@ -555,6 +661,6 @@ export default function DisplayController({ demoOn, playbackData }: DisplayOptio
     }, []);
 
     return (
-        <Display data={data} />
+        <Display data={data} otherIndication={otherIndication} />
     )
 }
